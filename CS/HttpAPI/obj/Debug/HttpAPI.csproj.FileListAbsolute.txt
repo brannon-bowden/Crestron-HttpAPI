@@ -1,0 +1,7 @@
+C:\Users\brannon\Documents\Visual Studio 2008\Projects\HttpAPI\HttpAPI\bin\HttpAPI.dll
+C:\Users\brannon\Documents\Visual Studio 2008\Projects\HttpAPI\HttpAPI\bin\HttpAPI.pdb
+C:\Users\brannon\Documents\Visual Studio 2008\Projects\HttpAPI\HttpAPI\bin\SimplSharpCustomAttributesInterface.dll
+C:\Users\brannon\Documents\Visual Studio 2008\Projects\HttpAPI\HttpAPI\bin\SimplSharpHelperInterface.dll
+C:\Users\brannon\Documents\Visual Studio 2008\Projects\HttpAPI\HttpAPI\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\brannon\Documents\Visual Studio 2008\Projects\HttpAPI\HttpAPI\obj\Debug\HttpAPI.dll
+C:\Users\brannon\Documents\Visual Studio 2008\Projects\HttpAPI\HttpAPI\obj\Debug\HttpAPI.pdb
