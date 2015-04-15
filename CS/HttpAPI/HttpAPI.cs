@@ -3,6 +3,8 @@ using System.Text;
 using Crestron.SimplSharp;                          				// For Basic SIMPL# Classes
 using Crestron.SimplSharp.Net.Http;
 
+
+
 namespace HttpAPIProcessor
 {
     public delegate void DigitalChangedEventHandler(DigitalChangeEventArgs e);
@@ -105,18 +107,15 @@ namespace HttpAPIProcessor
 
         public static void DigitalValueChange(ushort JoinID, ushort JoinValue)
         {
-            HttpAPI.Digitals[JoinID].state = JoinValue;
             SignalChangeEvents.onDigitalValueChange(new DigitalChangeEventArgs(JoinID, JoinValue));
         }
 
         public static void AnalogValueChange(ushort JoinID, ushort JoinValue)
         {
-            HttpAPI.Analogs[JoinID].state = JoinValue;
             SignalChangeEvents.onAnalogValueChange(new AnalogChangeEventArgs(JoinID, JoinValue));
         }
         public static void SerialValueChange(ushort JoinID, string JoinValue)
         {
-            HttpAPI.Serials[JoinID].state = JoinValue;
             SignalChangeEvents.onSerialValueChange(new SerialChangeEventArgs(JoinID, JoinValue));
         }        
     }
@@ -189,6 +188,19 @@ namespace HttpAPIProcessor
             return Serials[index].state;
         }
 
+        public void setDigitalSignal(int index, ushort value)
+        {
+            Digitals[index].state = value;
+        }
+        public void setAnalogSignal(int index, ushort value)
+        {
+            Analogs[index].state = value;
+        }
+        public void setSerialSignal(int index, string value)
+        {
+            Serials[index].state = value;
+        }
+
 
 
         public void StartServer()
@@ -218,33 +230,61 @@ namespace HttpAPIProcessor
         {
             //int bytesSent = 0;
             string QueryString = requestArgs.Request.Header.RequestPath;
+            string EventType = "";
             string JoinType = "";
             ushort JoinID = 0;
             string JoinValue = "0";
 
-            ErrorLog.Notice(requestArgs.Request.Header.RequestType.ToString());
-
+            //ErrorLog.Notice(requestArgs.Request.Header.RequestType.ToString());
+            //IP/get|set/Digital|Analog|Serial/JoinID/Value
             if (requestArgs.Request.Header.RequestType.ToString() == "GET")
             {
                 string[] words = QueryString.Split('/');
-                JoinType = words[1];
-                JoinID = (ushort)Convert.ToInt32(words[2]);
+                EventType = words[1];
+                JoinType = words[2];               
+                JoinID = (ushort)Convert.ToInt32(words[3]);
+                if(words[4] != null || words[4] != "")
+                    JoinValue = words[4];
 
-                switch (JoinType)
+                switch (JoinType.ToUpper())
                 {
-                    case ("Digital"):
+                    case ("DIGITAL"):
                         {
-                            requestArgs.Response.ContentString = getDigitalSignal(JoinID).ToString();
+                            if (EventType.ToUpper() == "SET")
+                            {
+                                SignalChangeEvents.DigitalValueChange(JoinID, (ushort)Convert.ToInt32(JoinValue));                                
+                                requestArgs.Response.ContentString = "OK";
+                            }
+                            else if (EventType.ToUpper() == "GET")
+                            {
+                                requestArgs.Response.ContentString = getDigitalSignal(JoinID).ToString();
+                            }
                             break;
                         }
-                    case ("Analog"):
+                    case ("ANALOG"):
                         {
-                            requestArgs.Response.ContentString = getAnalogSignal(JoinID).ToString();
+                            if (EventType.ToUpper() == "SET")
+                            {
+                                SignalChangeEvents.AnalogValueChange(JoinID, (ushort)Convert.ToInt32(JoinValue));
+                                requestArgs.Response.ContentString = "OK";
+                            }
+                            else if (EventType.ToUpper() == "GET")
+                            {
+                                requestArgs.Response.ContentString = getAnalogSignal(JoinID).ToString();
+                            }
                             break;
                         }
-                    case ("Serial"):
+                    case ("SERIAL"):
                         {
-                            requestArgs.Response.ContentString = getSerialSignal(JoinID).ToString();
+                            if (EventType.ToUpper() == "SET")
+                            {
+                                SignalChangeEvents.SerialValueChange(JoinID, JoinValue);
+                                requestArgs.Response.ContentString = "OK";
+                            }
+                            else if (EventType.ToUpper() == "GET")
+                            {
+                                requestArgs.Response.ContentString = getSerialSignal(JoinID).ToString();
+                            }
                             break;
                         }
                     default:
@@ -254,6 +294,7 @@ namespace HttpAPIProcessor
                 }
             }
 
+            /*
             if (requestArgs.Request.Header.RequestType.ToString() == "POST")
             {
                 string[] words = QueryString.Split('/');
@@ -284,6 +325,8 @@ namespace HttpAPIProcessor
                         }
                 }
             }
+             */
+            
 
 
             /*
